@@ -30,3 +30,11 @@ data("diamonds")
 ggplot(diamonds, aes(cut, price, fill = color)) +
   stat_summary(geom = "bar", fun = mean, position = "dodge") +
   stat_summary(geom = "errorbar", fun.data = mean_se, position = "dodge")
+
+ggplot(data = data, aes(x = condition, y = rt, fill = related)) +
+  stat_summary(geom = "bar", fun = mean, position = "dodge") +
+  scale_fill_manual(values = c("blue", "red")) +
+  stat_summary(geom = "errorbar", fun.data = mean_se, position = "dodge") +
+  ylim(0, 800) +
+  theme_bw() +
+  ggtitle("Reaction times by condition")
