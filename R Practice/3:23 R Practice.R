@@ -44,6 +44,17 @@ leveneTest(pym_all$assoc ~ pym_all$freq)
 
 t.test(pym_all$assoc ~ pym_all$freq, var.equal = TRUE, alternative = "greater")
 
+se.high <- sd(pym_high$assoc)/sqrt(length(pym_high$assoc))
+se.low <- sd(pym_low_cleaned$assoc)/sqrt(length(pym_low_cleaned$assoc))
+
+mean.high <- mean(pym_high$assoc)
+mean.low <- mean(pym_low_cleaned$assoc)
+
+ci.lower.high <- mean.high - (se.high * 1.96)
+ci.upper.high <- mean.high + (se.high * 1.96)
+
+ci.lower.low <- mean.low - (se.low * 1.96)
+ci.upper.low <- mean.low + (se.low * 1.96)
 
 mean = c(mean.high, mean.low)
 
@@ -54,3 +65,16 @@ barplot2(mean, plot.ci = TRUE, ci.l = ci.lower, ci.u = ci.upper,
          main = "Bar Plot with 95% Confidence Intervals",
          xlab = "Frequency Groups", ylab = "Average Number of Associations",
          names = c("High", "Low"), ylim = c(0,7))
+
+pym_part <- pym_high
+
+names(pym_part)[6] <- "assoc_high"
+
+pym_part$freq <- NULL
+
+pym_part$assoc_low <- paste(pym_low_cleaned$assoc)
+
+pym_part$assoc_low <- as.numeric(pym_part$assoc_low)
+
+t.test(pym_part$assoc_high, pym_part$assoc_low, paired = TRUE)
+
