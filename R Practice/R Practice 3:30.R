@@ -42,3 +42,5 @@ plot(ELP_2$LogRT ~ ELP_2$Length,
      xlab = "Word Length", ylab = "Log-Transformed RT")
 
 abline(m)
+
+
