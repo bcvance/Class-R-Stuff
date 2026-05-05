@@ -1,0 +1,124 @@
+---
+title: "Homework 3, Questions 3-4"
+author: 'Answered by: [write your name here]'
+output:
+  pdf_document: default
+  html_document:
+    keep_md: no
+    theme: readable
+    highlight: haddock
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, width=300, eval=T)
+```
+
+### Question 3 (27 pts)
+
+You are going to run analyses on a small data set that reports the grammar test scores of second-language learners of English who speak different first languages. Below I specified "ADD YOUR CODE HERE" where you should type the codes you use for questions. When you want to run codes, you can simply click the green triangle button on the right corner of each grey box. Your results from running codes will appear under Console.
+
+First, download 'HW3_data.csv' file on Canvas. This is the data set that you will work with for homework 3.
+
+#### a. Load your data frame to R and name it as HW_data. (1 pt)
+
+```{r}
+setwd("/Users/b.vance/Library/CloudStorage/OneDrive-UniversityofKansas/Research-Methods/R Practice")
+HW_data <- read.csv("HW3_data.csv")
+```
+
+#### b. (1) return the structure of the HW_data and (2) return the first 6 rows of HW_data. (4 pt)
+
+```{r}
+str(HW_data)
+head(HW_data)
+```
+
+#### c. Return summary statistics for the variable "Score" in the data frame. (1 pt)
+
+```{r}
+summary(HW_data$Score)
+```
+
+#### d. Return the variance and the standard error of the mean for the variable "Score". (3 pts)
+
+```{r}
+variance <- var(HW_data$Score)
+sem <- sd(HW_data$Score)/sqrt(length(HW_data$Score))
+variance
+sem
+```
+
+#### e. Plot the distribution of the variable "Score" using a histogram. Give your histogram the title "Distribution of Grammar Test Scores". Label the x axis as "Grammar Test Scores". Label your y axis as "Frequency". (4 pts)
+
+```{r}
+library(ggplot2)
+ggplot(data = HW_data, aes(x = Score)) +
+  geom_histogram(binwidth = 1) +
+  labs(title = "Distribution of Grammar Test Scores", x = "Grammar Test Scores", y = "Frequency")
+```
+
+#### f. Test whether the distribution of the variable "Score" is normal using the Shapiro-Wilk test. (1 pt)
+
+```{r}
+shapiro.test(HW_data$Score)
+```
+
+#### g. Create a boxplot in order to identify whether your distribution contains any outlier. Give your boxplot the title "Grammar Test Scores". Label the y axis as "Grammar Test Scores". (3 pts)
+
+```{r}
+ggplot(data = HW_data, aes(y = Score)) +
+  geom_boxplot() +
+  labs(title = "Grammar Test Scores", y = "Grammar Test Score")
+```
+
+#### h. Ask R to return the row that corresponds to the outlier identified in the boxplot. (1 pt)
+
+```{r}
+outlier <- which(HW_data$Score > 12)
+outlier
+```
+
+#### i. Create a new data frame called "HW3_data_cleaned" in which you have removed the outlier. (2 pts)
+
+```{r}
+HW3_data_cleaned <- HW_data[-outlier,]
+```
+
+#### j. Check your work by returning the dimensions of the new data frame "HW3_data_cleaned". (1 pt)
+
+```{r}
+dim(HW3_data_cleaned)
+```
+
+#### l. Run the Shapiro-Wilk test on the "Score" variable of the data frame "data_cleaned" to see if excluding the outlier fixed the distribution. (1 pt)
+
+```{r}
+shapiro.test(HW3_data_cleaned$Score)
+```
+
+#### m. Using the data frame "HW3_data_cleaned", create a table called "HW3_table" that contains the number of observations for each L1 group. (1 pt)
+
+```{r}
+library(dplyr)
+HW3_table <- HW3_data_cleaned %>%
+  count(L1)
+```
+
+#### n. Output the table. (1 pt)
+
+```{r}
+HW3_table
+```
+
+#### o. Create a boxplot in order to make sure the outlier is removed. Give your boxplot the title "Grammar Test Scores_Outlier removed". Label the y axis as "Grammar Test Scores". (3 pt)
+
+```{r}
+ggplot(data = HW3_data_cleaned, aes(y = Score)) +
+  geom_boxplot() +
+  labs(title = "Grammar Test Scores", y = "Grammar Test Scores")
+```
+
+### Once you are done, save this .Rmd file with your last name as the file name (e.g., Lee.Rmd). Click 'File' and 'Save As' and upload your .Rmd file on Canvas
+
+
+End of R markdown.

@@ -1,6 +1,6 @@
 ---
 title: "Take-Home Exam 2"
-author: 'Answered by: [write your name here]'
+author: 'Answered by: Ben'
 output:
 ---
 
