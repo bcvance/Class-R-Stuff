@@ -1,0 +1,170 @@
+---
+title: "Take-Home Exam 2"
+author: 'Answered by: [write your name here]'
+output:
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, width=300, eval=T)
+```
+
+###Questions; Total: 50 points
+
+Before running your analyses, read through all the questions below to familiarize yourself with what you will be asked to do in this take-home exam. 
+
+####a. Go ahead and load all the packages you will need for completing the analyses below.  (3 pt)
+
+```{r}
+library(moments); library(car); library(MASS); library(psych); library(ggplot2)
+```
+
+####b. We will use the dataset "TakeHomeExam2Data.csv". Go ahead and load this dataset into R. Call your data frame "data" (2 pt)
+
+```{r}
+data <- read.csv("TakeHomeExam2Data.csv")
+```
+
+The dataset contains the following information for each participant: identification number ("PartID"), gender ("Gender"; M = male, F = female), classroom level ("ClassLevel"; A = High Beginner, B = Low Intermediate, C = High Intermediate, D = Low Advanced, E = High Advanced), percent accuracy on the task ("Accuracy"), age of first exposure to English ("Age1Exp"), years of English instruction ("YrsInstr"), and daily percent use of English ("DailyUse"). 
+
+####c. Obtain the mean, standard deviation, standard error, minimum, maximum, and skewness of participants' accuracy on the task. (4 pts)
+
+```{r}
+describe(data$Accuracy)
+```
+
+####d. Create a histogram showing the distribution of the participants' accuracy on the task. Give it a title corresponding to what the histogram represents; label your x and y axes with the corresponding variables. (4 pts)
+
+```{r}
+ggplot(data, aes(x = Accuracy)) +
+  geom_histogram(binwidth = 5, fill = "steelblue", color = "white") +
+  labs(
+    x = "% Accuracy",
+    y = "Count"
+  ) +
+  theme_minimal()
+```
+
+####e. Create two boxplots, one showing the distribution of the male participants' accuracy separately for each of the classroom levels, and one showing the female participants' accuracy separately for each of the classroom levels. Give the boxplots titles corresponding to the gender of the participants; label your x and y axes with the corresponding variables. (7 pts)
+
+```{r}
+male_data <- subset(data, Gender == "M")
+female_data <- subset(data, Gender == "F")
+
+# Male plot
+ggplot(male_data, aes(x = ClassLevel, y = Accuracy)) +
+  geom_boxplot(fill = "cyan4") +
+  labs(
+    title = "Male Participants",
+    x = "Class Level",
+    y = "Accuracy"
+  ) +
+  theme_minimal()
+
+# Female plot
+ggplot(female_data, aes(x = ClassLevel, y = Accuracy)) +
+  geom_boxplot(fill = "coral1") +
+  labs(
+    title = "Female Participants",
+    x = "Class Level",
+    y = "Accuracy"
+  ) +
+  theme_minimal()
+```
+
+####f. Run a factorial ANOVA to examine the effects of classroom level and gender (and their possible interaction) on participants' accuracy, and obtain the results of this ANOVA. (3 pts)
+
+```{r}
+model <- aov(Accuracy ~ ClassLevel * Gender, data = data)
+summary(model)
+```
+
+####g. Run 'two separate' planned one-way ANOVAs to examine the effect of classroom level, one on the male participants' accuracy and one on the female participants' accuracy, and obtain the results of these two ANOVAs. (6 pts)
+
+```{r}
+male_model <- aov(Accuracy ~ ClassLevel, data = male_data)
+summary(male_model)
+
+female_model <- aov(Accuracy ~ ClassLevel, data = female_data)
+summary(female_model)
+```
+
+####h. Run two post-hoc Tukey HSD tests, one on the male participants' accuracy and one on the female participants' accuracy, to determine which pair(s) of classroom levels differ significantly. (2 pts)
+
+```{r}
+tukey_male <- TukeyHSD(male_model)
+print(tukey_male)
+
+tukey_female <- TukeyHSD(female_model)
+print(tukey_female)
+```
+
+####i.Create three boxplots showing the distribution of the participants' age of firt exposure to English, years of English instruction, and daily use of English. Give them titles indicating what each boxplot represents; label your y axis with the corresponding variable (5 pts)
+
+```{r}
+#This code is to set a 1 row x 3 column grid.
+par(mfrow = c(1,3))
+
+ggplot(data, aes(y = Age1Exp)) +
+  geom_boxplot(fill = "steelblue") +
+  labs(
+    title = "Age of First Exposure to English",
+    y = "Age of First Exposure"
+  ) +
+  theme_minimal()
+
+ggplot(data, aes(y = YrsInstr)) +
+  geom_boxplot(fill = "mediumpurple") +
+  labs(
+    title = "Years of English Instruction",
+    y = "Years of Instruction"
+  ) +
+  theme_minimal()
+
+ggplot(data, aes(y = DailyUse)) +
+  geom_boxplot(fill = "mediumseagreen") +
+  labs(
+    title = "Daily Use of English",
+    y = "Daily Use"
+  ) +
+  theme_minimal()
+```
+
+####j. Create a new column in the data frame called "LogDailyUse" which contains the log-transformed daily use of English, and create a boxplot showing the distribution of the participants' log-transformed daily use of English. (4 pts)
+
+```{r}
+data$LogDailyUse <- log(data$DailyUse)
+
+ggplot(data, aes(y = LogDailyUse)) +
+  geom_boxplot(fill = "salmon2") +
+  labs(
+    title = "Log-Transformed Daily Use of English",
+    y = "Log-Transformed Daily Use"
+  ) +
+  theme_minimal()
+```
+
+####k. Run three Pearson correlations: one between age of first exposure to English and years of English instruction, one between age of first exposure to English and log-transformed daily use of English, and one between years of English instruction and log-transformed daily use of English. (6 pts)
+
+```{r}
+cor.test(data$Age1Exp, data$YrsInstr, method = "pearson")
+
+cor.test(data$Age1Exp, data$LogDailyUse, method = "pearson")
+
+cor.test(data$YrsInstr, data$LogDailyUse, method = "pearson")
+
+```
+
+####l. Run a linear regression model on participants' accuracy, with gender, age of first exposure to English, years of English instruction, and log-transformed daily use of English as predictors (no interaction). Then, use a stepwise function to determine whether each independent variable contributes to explaining enough of the variance. Return the results of the stepwise model. (4 pts)
+
+```{r}
+full_model <- lm(Accuracy ~ Gender + Age1Exp + YrsInstr + LogDailyUse, data = data)
+summary(full_model)
+
+stepwise_model <- step(full_model, direction = "both")
+summary(stepwise_model)
+#hint: you can create some plots to interprete the linear regression model easily. use avPlots(m) to generate plots between each IV and DV (Accuracy).
+```
+
+
+End of markdown file
+
