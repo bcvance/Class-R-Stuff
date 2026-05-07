@@ -162,6 +162,8 @@ summary(full_model)
 
 stepwise_model <- step(full_model, direction = "both")
 summary(stepwise_model)
+
+avPlots(full_model)
 #hint: you can create some plots to interprete the linear regression model easily. use avPlots(m) to generate plots between each IV and DV (Accuracy).
 ```
 
